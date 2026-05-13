@@ -1,110 +1,77 @@
-export default function ZephyronARGSite() {
+import Link from "next/link";
+export default function Home() {
   return (
-    <div className="min-h-screen bg-black text-gray-200 font-mono overflow-hidden relative">
-      {/* VHS Noise */}
-      <div className="absolute inset-0 opacity-20 pointer-events-none bg-[radial-gradient(circle_at_center,white_1px,transparent_1px)] bg-[size:18px_18px]" />
+    <main className="min-h-screen bg-black text-white p-10 relative overflow-hidden">
 
-      {/* Scanlines */}
-      <div className="absolute inset-0 pointer-events-none opacity-10 bg-[linear-gradient(to_bottom,transparent_50%,rgba(255,255,255,0.08)_51%)] bg-[size:100%_4px]" />
+  {/* VHS NOISE */}
+  <div className="fixed inset-0 pointer-events-none z-[999] opacity-20">
+    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] animate-pulse"></div>
+  </div>
 
-      {/* Flicker */}
-      <div className="absolute inset-0 bg-black animate-pulse opacity-[0.03] pointer-events-none" />
+  {/* SCANLINES */}
+  <div
+    className="fixed inset-0 pointer-events-none z-[998]"
+    style={{
+      background: `repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.03),
+        rgba(255,255,255,0.03) 1px,
+        transparent 1px,
+        transparent 4px
+      )`
+    }}
+  ></div>
 
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6 py-12 text-center">
+  {/* VHS GLITCH */}
+  <div className="fixed top-[30%] left-0 w-full h-[3px] bg-white opacity-20 animate-pulse z-[1000]"></div>
 
-        {/* Symbol */}
-        <div className="mb-10 animate-pulse">
-          <div className="text-7xl tracking-[1rem] text-gray-500 select-none">
-            𐌆
-          </div>
+  <div className="fixed top-[60%] left-0 w-full h-[2px] bg-red-700 opacity-20 animate-pulse z-[1000]"></div>
+
+  <div className="max-w-5xl mx-auto w-full"></div>
+
+      <div className="max-w-5xl mx-auto w-full pt-32 relative z-10">
+
+        <p className="text-red-700 mb-6 tracking-widest">
+          ARQUIVO PARCIALMENTE RECUPERADO
+        </p>
+
+        <h1 className="text-4xl md:text-5xl text-white mb-12 tracking-[0.3em] break-all leading-relaxed max-w-full overflow-hidden">
+          Pd_1qm2pizhBS4nVK30qqwrillYbkmsu9DvhGOI_xhE
+        </h1>
+        <div className="w-full h-px bg-red-900 opacity-40 mb-10"></div>
+        <div className="space-y-3 text-sm opacity-70">
+          <p>STATUS DO SISTEMA: CORROMPIDO</p>
+          <p>PROTOCOLO ECLIPSE: INATIVO</p>
+          <p>CLÁUSULA 0: REMOVIDA</p>
+          <p>ATIVIDADE EXTRAPLANAR DETECTADA</p>
         </div>
 
-        {/* Main Text */}
-        <div className="mb-12 max-w-3xl">
-          <p className="text-sm md:text-lg tracking-[0.45rem] uppercase text-gray-300 leading-10 glitch">
-            R SKRZQHVFLPHQWR p XPD DUPD
-          </p>
+        <div className="flex gap-4 mt-10">
+
+          <Link href="/arquivos">
+            <button className="border border-white px-4 py-2 hover:bg-red-950 transition">
+              ARQUIVOS
+            </button>
+          </Link>
+
+          <Link href="/login">
+            <button className="border border-white px-4 py-2 hover:bg-red-950 transition">
+              LOGIN
+            </button>
+          </Link>
+          <Link href="/terminal">
+  <button className="border border-white px-4 py-2 hover:bg-red-950 transition">
+    TERMINAL
+  </button>
+</Link>
         </div>
 
-        {/* Locked Files */}
-        <div className="w-full max-w-4xl grid md:grid-cols-3 gap-6 mb-16">
-
-          <div className="relative border border-gray-900 rounded-2xl bg-zinc-950 overflow-hidden h-48 group">
-            <div className="absolute inset-0 backdrop-blur-md bg-black/70 z-10 flex flex-col items-center justify-center">
-              <div className="text-4xl mb-4">🔒</div>
-              <p className="tracking-[0.3rem] text-xs text-gray-500 uppercase">
-                Arquivo Bloqueado
-              </p>
-            </div>
-            <div className="p-6 opacity-30 text-left">
-              <p className="text-xs text-gray-600 mb-4 tracking-[0.3rem]">
-                ARQUIVO 01
-              </p>
-              <h2 className="text-lg text-gray-300 mb-3">
-                CLAUSULA ZERO
-              </h2>
-              <p className="text-sm text-gray-500 leading-relaxed blur-sm">
-                O padrão sempre retorna.
-              </p>
-            </div>
-          </div>
-
-          <div className="relative border border-gray-900 rounded-2xl bg-zinc-950 overflow-hidden h-48 group">
-            <div className="absolute inset-0 backdrop-blur-md bg-black/70 z-10 flex flex-col items-center justify-center">
-              <div className="text-4xl mb-4">🔒</div>
-              <p className="tracking-[0.3rem] text-xs text-gray-500 uppercase">
-                Arquivo Bloqueado
-              </p>
-            </div>
-            <div className="p-6 opacity-30 text-left">
-              <p className="text-xs text-gray-600 mb-4 tracking-[0.3rem]">
-                ARQUIVO 02
-              </p>
-              <h2 className="text-lg text-gray-300 mb-3">
-                OBSERVADOR
-              </h2>
-              <p className="text-sm text-gray-500 leading-relaxed blur-sm">
-                Ele observa antes mesmo da escolha.
-              </p>
-            </div>
-          </div>
-
-          <div className="relative border border-gray-900 rounded-2xl bg-zinc-950 overflow-hidden h-48 group">
-            <div className="absolute inset-0 backdrop-blur-md bg-black/70 z-10 flex flex-col items-center justify-center">
-              <div className="text-4xl mb-4">🔒</div>
-              <p className="tracking-[0.3rem] text-xs text-gray-500 uppercase">
-                Arquivo Bloqueado
-              </p>
-            </div>
-            <div className="p-6 opacity-30 text-left">
-              <p className="text-xs text-gray-600 mb-4 tracking-[0.3rem]">
-                ARQUIVO 03
-              </p>
-              <h2 className="text-lg text-gray-300 mb-3">
-                ECO
-              </h2>
-              <p className="text-sm text-gray-500 leading-relaxed blur-sm">
-                Algumas memórias não pertencem a você.
-              </p>
-            </div>
-          </div>
+        <div className="mt-24 opacity-30 text-xs">
+          “Se você encontrou isto… ele já percebeu.”
         </div>
 
-        {/* Input */}
-        <div className="w-full max-w-lg mb-14">
-          <input
-            type="password"
-            placeholder="acesso restrito"
-            className="w-full bg-black border border-gray-900 px-4 py-4 rounded-xl text-center text-gray-400 outline-none focus:border-gray-700 transition-all tracking-[0.25rem]"
-          />
-        </div>
-
-        {/* Footer */}
-        <div className="text-[10px] text-gray-700 tracking-[0.4rem] uppercase space-y-3 select-none">
-          <p>Observador ativo</p>
-          <p>Você já foi visto</p>
-        </div>
       </div>
-    </div>
-  )
+
+    </main>
+  );
 }
