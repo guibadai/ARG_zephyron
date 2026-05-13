@@ -48,29 +48,13 @@ export default function Arq01() {
 
           <div className="border border-red-900 p-6 space-y-4">
 
-            <p>
-              “rEpetição.”
-            </p>
-
-            <p>
-              “eCos.”
-            </p>
-
-            <p>
-              “cIcLOS.”
-            </p>
-
-            <p>
-              “caLafrios.”
-            </p>
-
-            <p>
-              “fALhas.”
-            </p>
-
-            <p>
-              “voCes.”
-            </p>
+          <p>“os Registros persistem.”</p>
+          <p>“ninguém Entende.”</p>
+          <p>“as Corrupções crescem.”</p>
+          <p>“os Arquivos observam.”</p>
+          <p>“o sistema Loopa.”</p>
+          <p>“eLes continuam aqui.”</p>
+          <p>“ninguém consegue fugir.”</p>
 
           </div>
 
