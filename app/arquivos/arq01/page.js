@@ -33,7 +33,7 @@ export default function Arq01() {
             </p>
 
             <p className="tracking-[0.4em] text-red-600 text-2xl break-all">
-              KLGTDTAQQLCCUVQMQGI
+              KLGRPTJRQLLDKGJOTNV
             </p>
 
           </div>
