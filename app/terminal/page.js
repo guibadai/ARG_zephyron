@@ -8,7 +8,19 @@ export default function Terminal() {
 
   const [password, setPassword] = useState("");
 
-  const correctPassword = "thereisnolastchoice";
+  const correctPassword =
+    "thereisnolastchoice";
+
+  // TERMINAL STATES
+
+  const [input, setInput] = useState("");
+
+  const [logs, setLogs] = useState([
+    "ACCESS GRANTED.",
+    "TYPE HELP FOR COMMANDS."
+  ]);
+
+  // LOGIN
 
   function handleLogin() {
 
@@ -24,7 +36,99 @@ export default function Terminal() {
     }
   }
 
-  // LOGIN
+  // TERMINAL COMMANDS
+
+  function handleCommand(command) {
+
+    const cmd = command.toLowerCase();
+
+    let response = "";
+
+    if (cmd === "help") {
+
+      response =
+`AVAILABLE COMMANDS:
+
+HELP
+STATUS
+ARCHIVE
+OBSERVER
+CLAUSULA0
+CLEAR`;
+
+    }
+
+    else if (cmd === "status") {
+
+      response =
+`SYSTEM STATUS:
+
+INTEGRITY: 18%
+MEMORY LOSS: CRITICAL
+ENTITY INFLUENCE: DETECTED
+ARCHIVE STABILITY: FAILING`;
+
+    }
+
+    else if (cmd === "archive") {
+
+      response =
+`ARCHIVE SYSTEM:
+
+ARQ-01 : RECOVERED
+ARQ-02 : LOCKED
+ARQ-03 : CORRUPTED
+ARQ-04 : MISSING`;
+
+    }
+
+    else if (cmd === "observer") {
+
+      response =
+`"the observers stopped recording
+after the third signal."`;
+
+    }
+
+    else if (cmd === "clausula0") {
+
+      response =
+`ACCESSING...
+
+ERROR
+
+ERROR
+
+ERROR
+
+"there was never a final choice."`;
+
+    }
+
+    else if (cmd === "clear") {
+
+      setLogs([]);
+
+      setInput("");
+
+      return;
+    }
+
+    else {
+
+      response = "UNKNOWN COMMAND";
+    }
+
+    setLogs((prev) => [
+      ...prev,
+      `> ${command}`,
+      response
+    ]);
+
+    setInput("");
+  }
+
+  // LOGIN SCREEN
 
   if (!authorized) {
 
@@ -34,7 +138,7 @@ export default function Terminal() {
 
         <div className="border border-green-900 p-10 max-w-2xl w-full">
 
-          <h1 className="text-4xl text-white mb-10 tracking-widest">
+          <h1 className="text-4xl text-white mb-10 tracking-widest break-all">
             OBSERVER TERMINAL
           </h1>
 
@@ -78,7 +182,7 @@ export default function Terminal() {
     );
   }
 
-  // TERMINAL LIBERADO
+  // TERMINAL SCREEN
 
   return (
 
@@ -86,29 +190,48 @@ export default function Terminal() {
 
       <div className="max-w-5xl mx-auto">
 
-        <h1 className="text-5xl text-white mb-10 tracking-widest">
-          TERMINAL ACCESS GRANTED
+        <h1 className="text-5xl text-white mb-10 tracking-widest break-all">
+          OBSERVER TERMINAL
         </h1>
 
-        <div className="border border-green-900 p-8">
+        <div className="border border-green-900 p-8 h-[70vh] overflow-y-auto">
 
-          <p>
-            WELCOME, OBSERVER.
-          </p>
+          <div className="space-y-6 whitespace-pre-line">
 
-          <p className="mt-6 opacity-60">
-            SYSTEM INTEGRITY:
-            18%
-          </p>
+            {logs.map((log, i) => (
 
-          <p className="mt-2 opacity-60">
-            ENTITY INFLUENCE:
-            UNKNOWN
-          </p>
+              <div key={i}>
+                {log}
+              </div>
 
-          <p className="mt-12 text-red-700 animate-pulse">
-            “the cycle continues.”
-          </p>
+            ))}
+
+          </div>
+
+          <div className="flex mt-8">
+
+            <span className="mr-3">
+              {">"}
+            </span>
+
+            <input
+              autoFocus
+              value={input}
+              onChange={(e) =>
+                setInput(e.target.value)
+              }
+              onKeyDown={(e) => {
+
+                if (e.key === "Enter") {
+
+                  handleCommand(input);
+                }
+
+              }}
+              className="bg-transparent outline-none flex-1"
+            />
+
+          </div>
 
         </div>
 
