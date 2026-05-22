@@ -1,29 +1,32 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+
+const messages = [
+
+  "the signal grows stronger",
+  "memory corruption detected",
+  "it remembers your choices",
+  "do not trust repetition",
+  "the observers are gone",
+  "something survived the archive",
+  "it watches through the static",
+  "there is no final choice"
+
+];
 
 export default function Login() {
-
-  const targetDate = new Date("2026-05-22T00:00:00");
+  const router = useRouter();
+  const redirectStarted = useRef(false);
 
   const [timeLeft, setTimeLeft] = useState("");
-
-  const messages = [
-
-    "the signal grows stronger",
-    "memory corruption detected",
-    "it remembers your choices",
-    "do not trust repetition",
-    "the observers are gone",
-    "something survived the archive",
-    "it watches through the static",
-    "there is no final choice"
-
-  ];
 
   const [message, setMessage] = useState(messages[0]);
 
   useEffect(() => {
+
+    const targetDate = new Date;
 
     const interval = setInterval(() => {
 
@@ -34,6 +37,18 @@ export default function Login() {
       if (difference <= 0) {
 
         setTimeLeft("ACCESS AVAILABLE");
+
+        if (!redirectStarted.current) {
+
+          redirectStarted.current = true;
+
+          setTimeout(() => {
+
+            router.push("/workbech");
+
+          }, 1000);
+
+        }
 
         return;
       }
@@ -64,7 +79,7 @@ export default function Login() {
 
     return () => clearInterval(interval);
 
-  }, []);
+  }, [router]);
 
   // RANDOM MESSAGES
 
@@ -87,7 +102,7 @@ export default function Login() {
 
   return (
 
-    <main className="min-h-screen bg-black text-green-400 font-mono overflow-hidden relative flex items-center justify-center p-10">
+    <main className="arg-page min-h-screen text-green-400 font-mono overflow-hidden relative flex items-center justify-center p-6 sm:p-10">
 
       {/* SCANLINES */}
 
@@ -108,9 +123,13 @@ export default function Login() {
 
       <div className="fixed inset-0 opacity-10 pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
 
-      <div className="relative z-10 max-w-3xl w-full border border-green-900 p-10">
+      <div className="arg-panel relative z-10 max-w-3xl w-full p-7 sm:p-10">
 
-        <h1 className="text-5xl text-white mb-12 tracking-widest">
+        <p className="mb-4 text-xs uppercase tracking-[0.3em] text-red-500/70">
+          countdown relay // workbench gate
+        </p>
+
+        <h1 className="arg-title text-4xl sm:text-5xl text-white mb-12 tracking-widest">
           OBSERVER LOGIN
         </h1>
 
@@ -118,25 +137,25 @@ export default function Login() {
           ACCESS TEMPORARILY RESTRICTED
         </p>
 
-        <div className="border border-red-900 p-8 mb-10">
+        <div className="border border-red-900/80 bg-red-950/10 p-6 sm:p-8 mb-10 shadow-[inset_0_0_30px_rgba(0,0,0,0.75)]">
 
           <p className="text-red-700 mb-4">
             NEXT SIGNAL:
           </p>
 
-          <p className="text-5xl tracking-widest text-white">
+          <p className="text-4xl sm:text-5xl tracking-widest text-white animate-[textRupture_6s_steps(2,end)_infinite]">
             {timeLeft}
           </p>
 
         </div>
 
-        <div className="opacity-50 text-lg min-h-[40px] animate-pulse">
+        <div className="opacity-60 text-lg min-h-[40px] animate-pulse">
 
           {message}
 
         </div>
 
-        <div className="mt-16 opacity-20 text-sm leading-8">
+        <div className="mt-16 opacity-25 text-sm leading-8">
 
           <p>
             observer protocol unstable

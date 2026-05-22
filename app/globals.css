@@ -13,6 +13,59 @@ html, body {
   overflow-x: hidden;
 }
 
+::selection {
+  background: rgba(127, 29, 29, 0.85);
+  color: #e6ffe6;
+}
+
+a,
+button,
+input {
+  cursor: crosshair;
+}
+
+.arg-page {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 50% 35%, rgba(28, 84, 88, 0.18), transparent 36%),
+    linear-gradient(145deg, #071416 0%, #020303 58%, #080202 100%);
+}
+
+.arg-panel {
+  border: 1px solid rgba(34, 197, 94, 0.28);
+  background:
+    linear-gradient(180deg, rgba(3, 18, 16, 0.86), rgba(0, 0, 0, 0.88)),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.02) 0 1px, transparent 1px 5px);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.9),
+    8px 8px 0 rgba(0, 0, 0, 0.45),
+    inset 0 0 42px rgba(0, 0, 0, 0.72);
+}
+
+.arg-button {
+  border: 1px solid rgba(180, 180, 160, 0.5);
+  background: rgba(12, 18, 17, 0.88);
+  color: #d9f99d;
+  box-shadow:
+    inset 1px 1px rgba(255, 255, 255, 0.12),
+    inset -2px -2px rgba(0, 0, 0, 0.75),
+    0 0 18px rgba(20, 83, 45, 0.08);
+}
+
+.arg-button:hover {
+  background: rgba(69, 10, 10, 0.72);
+  color: #fee2e2;
+}
+
+.arg-title {
+  text-shadow:
+    2px 0 rgba(255, 0, 0, 0.32),
+    -2px 0 rgba(0, 255, 157, 0.2),
+    0 0 18px rgba(255, 255, 255, 0.22);
+}
+
 /* CRT BASE */
 
 body {
@@ -59,6 +112,52 @@ body::after {
   z-index: 998;
 
   animation: noiseMove 0.2s infinite;
+}
+
+.arg-crt-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1090;
+  opacity: 0.3;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.08),
+      rgba(255,255,255,0.08) 1px,
+      transparent 2px,
+      transparent 5px
+    ),
+    radial-gradient(circle at 50% 50%, transparent 55%, rgba(0,0,0,0.58) 100%);
+  mix-blend-mode: screen;
+  animation: argCrtDrift 6s infinite;
+}
+
+.arg-ghosting {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1089;
+  opacity: 0.12;
+  background:
+    linear-gradient(90deg, rgba(255,0,0,0.2), transparent 18%, rgba(0,255,157,0.16) 52%, transparent 82%, rgba(57,88,255,0.18));
+  mix-blend-mode: screen;
+  animation: argGhost 4.8s steps(2, end) infinite;
+}
+
+.arg-route-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 1190;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    repeating-linear-gradient(to bottom, rgba(255,255,255,0.2) 0 2px, transparent 2px 7px),
+    rgba(127, 29, 29, 0.2);
+}
+
+.arg-route-flash--active {
+  animation: argRouteFlash 520ms steps(3, end);
 }
 
 @keyframes noiseMove {
@@ -195,4 +294,109 @@ button:hover {
   0% { opacity: 0.02; }
   50% { opacity: 0.05; }
   100% { opacity: 0.02; }
+}
+
+@keyframes hardShake {
+  0% { transform: translate(0, 0) skew(0deg); }
+  20% { transform: translate(-8px, 3px) skew(0.8deg); }
+  40% { transform: translate(5px, -4px) skew(-0.6deg); }
+  60% { transform: translate(-3px, 6px) skew(0.4deg); }
+  80% { transform: translate(7px, -2px) skew(-0.9deg); }
+  100% { transform: translate(0, 0) skew(0deg); }
+}
+
+@keyframes rgbDrag {
+  0% { transform: translateX(0); filter: hue-rotate(0deg); }
+  33% { transform: translateX(-9px); filter: hue-rotate(35deg); }
+  66% { transform: translateX(7px); filter: hue-rotate(-30deg); }
+  100% { transform: translateX(0); filter: hue-rotate(0deg); }
+}
+
+@keyframes crtBlink {
+  0% { opacity: 0.05; }
+  50% { opacity: 0.28; }
+  100% { opacity: 0.02; }
+}
+
+@keyframes scanTear {
+  0% { transform: translateY(-12px) scaleX(1); }
+  50% { transform: translateY(18px) scaleX(1.08); }
+  100% { transform: translateY(-4px) scaleX(0.96); }
+}
+
+@keyframes dataTear {
+  0% { transform: translateX(-12px); opacity: 0; }
+  25% { opacity: 0.8; }
+  50% { transform: translateX(22px); opacity: 0.2; }
+  100% { transform: translateX(-3px); opacity: 0; }
+}
+
+@keyframes textRupture {
+  0% { transform: translate(0, 0); text-shadow: 2px 0 #ff0000, -2px 0 #00ff9d; }
+  50% { transform: translate(-3px, 1px); text-shadow: -3px 0 #ff0000, 3px 0 #2f61ff; }
+  100% { transform: translate(2px, -1px); text-shadow: 1px 0 #ff0000, -1px 0 #00ff9d; }
+}
+
+@keyframes zephyronFlicker {
+  0% { opacity: 0.45; filter: contrast(1.2) brightness(0.7); }
+  30% { opacity: 0.72; filter: contrast(1.7) brightness(1.1); }
+  55% { opacity: 0.2; filter: contrast(2.4) brightness(1.8); }
+  100% { opacity: 0.95; filter: contrast(1.5) brightness(0.95); }
+}
+
+@keyframes whiteBurst {
+  0% { opacity: 0; }
+  45% { opacity: 0.25; }
+  48% { opacity: 0.75; }
+  52% { opacity: 0.08; }
+  100% { opacity: 0; }
+}
+
+@keyframes iconPanic {
+  0% { transform: translate(0, 0); filter: brightness(1); }
+  50% { transform: translate(2px, -2px); filter: brightness(1.8); }
+  100% { transform: translate(-2px, 1px); filter: brightness(0.8); }
+}
+
+@keyframes noiseCrawl {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(4px, 4px); }
+}
+
+@keyframes argCrtDrift {
+  0% { transform: translateY(0); opacity: 0.24; }
+  48% { transform: translateY(1px); opacity: 0.32; }
+  50% { transform: translateY(-2px); opacity: 0.44; }
+  100% { transform: translateY(0); opacity: 0.27; }
+}
+
+@keyframes argGhost {
+  0% { transform: translateX(0); filter: hue-rotate(0deg); }
+  33% { transform: translateX(-3px); filter: hue-rotate(18deg); }
+  66% { transform: translateX(4px); filter: hue-rotate(-12deg); }
+  100% { transform: translateX(0); filter: hue-rotate(0deg); }
+}
+
+@keyframes argRouteFlash {
+  0% { opacity: 0; transform: scaleY(1); }
+  16% { opacity: 0.45; transform: scaleY(1.02); }
+  33% { opacity: 0.08; transform: translateX(-8px); }
+  45% { opacity: 0.3; transform: translateX(6px); }
+  100% { opacity: 0; transform: translateX(0); }
+}
+
+@keyframes terminalCursor {
+  0%, 48% { opacity: 1; }
+  49%, 100% { opacity: 0; }
+}
+
+@keyframes slowThreat {
+  0%, 92%, 100% { opacity: 0; transform: translateY(0); }
+  94% { opacity: 0.85; transform: translateY(-2px); }
+  96% { opacity: 0.18; transform: translateY(1px); }
+}
+
+@keyframes archiveBreathe {
+  0%, 100% { filter: brightness(0.92) contrast(1.05); }
+  50% { filter: brightness(1.08) contrast(1.25); }
 }

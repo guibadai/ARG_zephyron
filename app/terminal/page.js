@@ -1,6 +1,71 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+const correctPassword =
+  "thereisnolastchoice";
+
+const initialLogs = [
+  "ACCESS GRANTED.",
+  "TYPE HELP FOR COMMANDS."
+];
+
+const forbiddenCommands = {
+  echo:
+`echo did not return alone.
+
+"someone answered the signal."`,
+
+  witness:
+`WITNESS TABLE:
+
+cycle one: removed
+cycle two: removed
+cycle three: removed
+
+one witness remains unlisted.`,
+
+  cycle:
+`CYCLE REPORT:
+
+the entity remembers previous cycles.
+the archive does not.`,
+
+  signal:
+`SIGNAL DETECTED BELOW ARCHIVE LAYER.
+
+depth: impossible
+source: listening`,
+
+  breach:
+`BREACH EVENT LOG:
+
+containment door closed.
+containment door opened inward.
+no operator found.`,
+
+  mirror:
+`the mirror was never empty.
+
+do not wait for your reflection to move first.`,
+
+  burial:
+`BURIAL UNSUCCESSFUL.
+
+the thing beneath the archive continued transmitting.`,
+
+  repeat:
+`DO NOT REPEAT THE COMMAND.`
+};
+
+const rareMessages = [
+  "HE IS WATCHING",
+  "DO NOT REPEAT THE COMMAND",
+  "THE ENTITY LEARNED YOUR PATTERNS",
+  "INPUT DELAY IS NOT LOCAL",
+  "OBSERVER PRESENCE CONFIRMED",
+  "YOUR LAST COMMAND WAS RECORDED BEFORE YOU TYPED IT"
+];
 
 export default function Terminal() {
 
@@ -8,19 +73,46 @@ export default function Terminal() {
 
   const [password, setPassword] = useState("");
 
-  const correctPassword =
-    "thereisnolastchoice";
-
-  // TERMINAL STATES
-
   const [input, setInput] = useState("");
 
-  const [logs, setLogs] = useState([
-    "ACCESS GRANTED.",
-    "TYPE HELP FOR COMMANDS."
-  ]);
+  const [logs, setLogs] = useState(initialLogs);
 
-  // LOGIN
+  const [thinking, setThinking] = useState(false);
+
+  const [corrupt, setCorrupt] = useState(false);
+
+  const audioRef = useRef(null);
+
+  const terminalRef = useRef(null);
+
+  useEffect(() => {
+    terminalRef.current?.scrollTo({
+      top: terminalRef.current.scrollHeight,
+      behavior: "smooth"
+    });
+  }, [logs, thinking]);
+
+  useEffect(() => {
+    if (!authorized) return;
+
+    const interval = setInterval(() => {
+      if (Math.random() > 0.38) return;
+
+      setCorrupt(true);
+
+      setLogs((prev) => [
+        ...prev,
+        {
+          text: rareMessages[Math.floor(Math.random() * rareMessages.length)],
+          ghost: true
+        }
+      ]);
+
+      setTimeout(() => setCorrupt(false), 420);
+    }, 9000);
+
+    return () => clearInterval(interval);
+  }, [authorized]);
 
   function handleLogin() {
 
@@ -30,16 +122,17 @@ export default function Terminal() {
 
       setAuthorized(true);
 
+      setTimeout(() => playTone("grant"), 120);
+
     } else {
+
+      playTone("denied");
 
       alert("ACCESS DENIED");
     }
   }
 
-  // TERMINAL COMMANDS
-
-  function handleCommand(command) {
-
+  function resolveCommand(command) {
     const cmd = command.toLowerCase();
 
     let response = "";
@@ -54,7 +147,9 @@ STATUS
 ARCHIVE
 OBSERVER
 CLAUSULA0
-CLEAR`;
+CLEAR
+
+UNINDEXED COMMANDS DETECTED`;
 
     }
 
@@ -105,7 +200,29 @@ ERROR
 
     }
 
-    else if (cmd === "clear") {
+    else if (forbiddenCommands[cmd]) {
+
+      response = forbiddenCommands[cmd];
+
+    }
+
+    else {
+
+      response = "UNKNOWN COMMAND";
+    }
+
+    return { cmd, response };
+  }
+
+  function handleCommand(command) {
+
+    if (!command.trim()) return;
+
+    const { cmd, response } = resolveCommand(command.trim());
+
+    playTone("key");
+
+    if (cmd === "clear") {
 
       setLogs([]);
 
@@ -114,47 +231,57 @@ ERROR
       return;
     }
 
-    else {
-
-      response = "UNKNOWN COMMAND";
-    }
-
     setLogs((prev) => [
       ...prev,
-      `> ${command}`,
-      response
+      `> ${command}`
     ]);
 
     setInput("");
+    setThinking(true);
+
+    const delay = 260 + Math.floor(Math.random() * 820) + (cmd === "clausula0" ? 900 : 0);
+
+    setTimeout(() => {
+      playTone(response === "UNKNOWN COMMAND" ? "denied" : "reply");
+      setCorrupt(Math.random() > 0.55);
+      setLogs((prev) => [
+        ...prev,
+        response
+      ]);
+      setThinking(false);
+      setTimeout(() => setCorrupt(false), 360);
+    }, delay);
   }
 
-  // LOGIN SCREEN
+  function onInputChange(value) {
+    setInput(value);
+    playTone("key");
+  }
 
   if (!authorized) {
 
     return (
 
-      <main className="min-h-screen bg-black text-green-400 p-10 font-mono flex items-center justify-center">
+      <main className="arg-page flex min-h-screen items-center justify-center overflow-hidden p-6 font-mono text-green-400 sm:p-10">
 
-        <div className="border border-green-900 p-10 max-w-2xl w-full">
+        <section className={`arg-panel relative z-10 w-full max-w-2xl p-7 sm:p-10 ${corrupt ? "animate-[hardShake_90ms_steps(2,end)_infinite]" : ""}`}>
 
-          <h1 className="text-4xl text-white mb-10 tracking-widest break-all">
+          <p className="mb-4 text-xs uppercase tracking-[0.32em] text-red-500/70">
+            restricted relay // observer shell
+          </p>
+
+          <h1 className="arg-title mb-10 break-all text-4xl tracking-widest text-white sm:text-5xl">
             OBSERVER TERMINAL
           </h1>
 
-          <p className="opacity-60 mb-8">
-            AUTHORIZATION REQUIRED
-          </p>
+          <div className="mb-10 border border-red-900/70 bg-red-950/10 p-5">
 
-          <div className="border border-red-900 p-6 mb-10">
-
-            <p className="text-red-700">
+            <p className="text-red-500">
               WARNING:
             </p>
 
-            <p className="opacity-60 mt-4">
-              unauthorized access attempts
-              are being monitored.
+            <p className="mt-4 text-green-100/50">
+              unauthorized access attempts are being monitored by a process that has no registered owner.
             </p>
 
           </div>
@@ -166,51 +293,80 @@ ERROR
             onChange={(e) =>
               setPassword(e.target.value)
             }
-            className="bg-transparent border border-green-900 p-4 w-full outline-none mb-6"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleLogin();
+              }
+            }}
+            className="mb-6 w-full border border-green-900 bg-black/70 p-4 text-green-300 outline-none shadow-[inset_0_0_22px_rgba(0,0,0,0.85)] placeholder:text-green-800"
           />
 
           <button
             onClick={handleLogin}
-            className="border border-green-900 px-6 py-3 hover:bg-green-950/30 transition"
+            className="arg-button px-6 py-3 uppercase tracking-[0.22em]"
           >
             ACCESS TERMINAL
           </button>
 
-        </div>
+          <div className="mt-12 text-xs leading-6 text-green-900">
+            <p>handshake: unstable</p>
+            <p>remote echo: present</p>
+            <p className="animate-[slowThreat_8s_steps(2,end)_infinite] text-red-700">it typed first</p>
+          </div>
+
+        </section>
 
       </main>
     );
   }
 
-  // TERMINAL SCREEN
-
   return (
 
-    <main className="min-h-screen bg-black text-green-400 p-10 font-mono">
+    <main className={`arg-page min-h-screen overflow-hidden p-4 font-mono text-green-400 sm:p-10 ${corrupt ? "animate-[hardShake_90ms_steps(2,end)_infinite]" : ""}`}>
 
-      <div className="max-w-5xl mx-auto">
+      <div className="relative z-10 mx-auto max-w-6xl">
 
-        <h1 className="text-5xl text-white mb-10 tracking-widest break-all">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-green-900/50 pb-3 text-xs text-green-700">
+          <span>OBSERVER TERMINAL // LIVE SHELL</span>
+          <span className="text-red-700">ENTITY INFLUENCE: DETECTED</span>
+        </div>
+
+        <h1 className="arg-title mb-8 break-all text-4xl tracking-widest text-white sm:text-5xl">
           OBSERVER TERMINAL
         </h1>
 
-        <div className="border border-green-900 p-8 h-[70vh] overflow-y-auto">
+        <section
+          ref={terminalRef}
+          className="arg-panel h-[72vh] overflow-y-auto p-5 shadow-[inset_0_0_80px_rgba(0,0,0,0.9)] sm:p-8"
+        >
 
-          <div className="space-y-6 whitespace-pre-line">
+          <div className="space-y-6 whitespace-pre-line text-sm leading-6 sm:text-base">
 
-            {logs.map((log, i) => (
+            {logs.map((log, i) => {
+              const text = typeof log === "string" ? log : log.text;
+              const ghost = typeof log === "object" && log.ghost;
 
-              <div key={i}>
-                {log}
+              return (
+                <div
+                  key={`${text}-${i}`}
+                  className={`${ghost ? "text-red-500/80 animate-[textRupture_140ms_steps(2,end)_infinite]" : ""} ${text.includes("ERROR") || text.includes("UNKNOWN") ? "text-red-500" : ""}`}
+                >
+                  {text}
+                </div>
+              );
+            })}
+
+            {thinking && (
+              <div className="text-green-700">
+                remote process writing<span className="animate-pulse">...</span>
               </div>
-
-            ))}
+            )}
 
           </div>
 
-          <div className="flex mt-8">
+          <div className="mt-8 flex border-t border-green-900/40 pt-5">
 
-            <span className="mr-3">
+            <span className="mr-3 text-red-500">
               {">"}
             </span>
 
@@ -218,7 +374,7 @@ ERROR
               autoFocus
               value={input}
               onChange={(e) =>
-                setInput(e.target.value)
+                onInputChange(e.target.value)
               }
               onKeyDown={(e) => {
 
@@ -228,15 +384,50 @@ ERROR
                 }
 
               }}
-              className="bg-transparent outline-none flex-1"
+              className="flex-1 bg-transparent text-green-200 outline-none"
             />
+
+            <span className="ml-1 inline-block w-3 bg-green-300 text-black animate-[terminalCursor_900ms_steps(2,end)_infinite]">
+              &nbsp;
+            </span>
 
           </div>
 
-        </div>
+        </section>
 
       </div>
 
     </main>
   );
+}
+
+function playTone(kind) {
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+
+  if (!AudioContext) return;
+
+  const context = new AudioContext();
+  const oscillator = context.createOscillator();
+  const gain = context.createGain();
+  const filter = context.createBiquadFilter();
+
+  const frequency = {
+    key: 720,
+    reply: 160,
+    denied: 92,
+    grant: 420
+  }[kind];
+
+  oscillator.type = kind === "key" ? "square" : "sawtooth";
+  oscillator.frequency.value = frequency;
+  filter.type = "bandpass";
+  filter.frequency.value = kind === "key" ? 1100 : 280;
+  gain.gain.value = kind === "key" ? 0.018 : 0.045;
+
+  oscillator.connect(filter);
+  filter.connect(gain);
+  gain.connect(context.destination);
+
+  oscillator.start();
+  oscillator.stop(context.currentTime + (kind === "key" ? 0.025 : 0.18));
 }

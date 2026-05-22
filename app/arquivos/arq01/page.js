@@ -2,15 +2,19 @@ export default function Arq01() {
 
   return (
 
-    <main className="min-h-screen bg-black text-white p-10 font-mono">
+    <main className="arg-page min-h-screen text-white p-6 sm:p-10 font-mono overflow-hidden">
 
-      <div className="max-w-4xl mx-auto">
+      <div className="relative z-10 max-w-4xl mx-auto">
 
-        <h1 className="text-5xl text-white mb-12 tracking-widest">
+        <p className="mb-4 text-xs uppercase tracking-[0.3em] text-red-500/70">
+          recovered fragment // do not normalize text
+        </p>
+
+        <h1 className="arg-title text-4xl sm:text-5xl text-white mb-12 tracking-widest">
           ARQ-01 — FRAGMENTO RECUPERADO
         </h1>
 
-        <div className="space-y-10 opacity-80 leading-8">
+        <div className="arg-panel space-y-10 p-6 sm:p-8 opacity-90 leading-8">
 
           <p className="text-green-500">
             LOG//OBSERVADOR-01
@@ -26,13 +30,13 @@ export default function Arq01() {
             à corrupção.
           </p>
 
-          <div className="border border-red-900 p-6">
+          <div className="border border-red-900/80 bg-red-950/10 p-6 shadow-[inset_0_0_35px_rgba(0,0,0,0.8)]">
 
             <p className="opacity-50 mb-6">
               FRAGMENTO RECUPERADO:
             </p>
 
-            <p className="tracking-[0.4em] text-red-600 text-2xl break-all">
+            <p className="tracking-[0.4em] text-red-600 text-2xl break-all animate-[textRupture_5s_steps(2,end)_infinite]">
               KLGRPTJRQLLDKGJOTNV
             </p>
 
@@ -46,7 +50,7 @@ export default function Arq01() {
             mas todos descrevem a mesma sensação:
           </p>
 
-          <div className="border border-red-900 p-6 space-y-4">
+          <div className="border border-red-900/80 bg-black/40 p-6 space-y-4">
 
           <p>“os Registros persistem.”</p>
           <p>“ninguém Entende.”</p>
@@ -63,7 +67,7 @@ export default function Arq01() {
             dentro das falhas.”
           </p>
 
-          <div className="mt-20 border border-green-900 p-6 opacity-40">
+          <div className="mt-20 border border-green-900/80 bg-black/50 p-6 opacity-50">
 
             <p>
               STATUS DO ARQUIVO:

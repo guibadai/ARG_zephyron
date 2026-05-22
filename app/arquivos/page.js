@@ -3,9 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
-export default function Arquivos() {
-
-  const bootLines = [
+const bootLines = [
     "BOOTING OBSERVER SYSTEM...",
     "RESTORING MEMORY...",
     "SEARCHING ARCHIVES...",
@@ -13,26 +11,32 @@ export default function Arquivos() {
     "RECOVERING SURVIVING FILES..."
   ];
 
+export default function Arquivos() {
+
   const [displayedLines, setDisplayedLines] = useState([]);
   const [currentLine, setCurrentLine] = useState("");
   const [lineIndex, setLineIndex] = useState(0);
   const [charIndex, setCharIndex] = useState(0);
   const [bootFinished, setBootFinished] = useState(false);
   const [checkedStorage, setCheckedStorage] = useState(false);
-useEffect(() => {
+  useEffect(() => {
 
-  const alreadyBooted =
-    sessionStorage.getItem("observer_boot");
+    const alreadyBooted =
+      sessionStorage.getItem("observer_boot");
 
-  if (alreadyBooted === "true") {
+    queueMicrotask(() => {
 
-    setBootFinished(true);
+      if (alreadyBooted === "true") {
 
-  }
+        setBootFinished(true);
 
-  setCheckedStorage(true);
+      }
 
-}, []);
+      setCheckedStorage(true);
+
+    });
+
+  }, []);
   useEffect(() => {
 
     if (lineIndex >= bootLines.length) {
@@ -78,11 +82,11 @@ useEffect(() => {
 
   return (
 
-    <main className="min-h-screen bg-black text-green-400 p-10 font-mono">
+    <main className="arg-page min-h-screen text-green-400 p-6 sm:p-10 font-mono overflow-hidden">
 
       {checkedStorage && !bootFinished ? (
 
-        <div className="space-y-3 text-lg">
+        <div className="arg-panel relative z-10 space-y-3 text-lg p-6 sm:p-10 max-w-4xl">
 
           {displayedLines.map((line, i) => (
 
@@ -113,19 +117,23 @@ useEffect(() => {
 
       ) : (
 
-        <div className="max-w-5xl mx-auto">
+        <div className="relative z-10 max-w-5xl mx-auto">
 
-          <h1 className="text-5xl text-white mb-12 tracking-widest">
+          <p className="mb-4 text-xs uppercase tracking-[0.3em] text-red-500/70">
+            archive index // containment damaged
+          </p>
+
+          <h1 className="arg-title text-4xl sm:text-5xl text-white mb-12 tracking-widest">
             OBSERVER ARCHIVE SYSTEM
           </h1>
 
-          <div className="border border-green-800">
+          <div className="arg-panel overflow-hidden">
 
             {/* ARQ 01 */}
 
             <Link href="/arquivos/arq01">
 
-              <div className="border-b border-green-900 p-6 hover:bg-green-950/20 transition cursor-pointer">
+              <div className="border-b border-green-900/70 p-6 hover:bg-green-950/30 hover:text-green-100 transition cursor-pointer">
 
                 <p className="text-xl text-white">
                   [ARQ-01]
@@ -141,7 +149,7 @@ useEffect(() => {
 
             {/* LOCKED */}
 
-            <div className="border-b border-green-900 p-6 opacity-40">
+            <div className="border-b border-green-900/70 p-6 opacity-40">
 
               <p className="text-xl">
                 [ARQ-02]
@@ -155,7 +163,7 @@ useEffect(() => {
 
             {/* CORRUPTED */}
 
-            <div className="border-b border-green-900 p-6 text-red-700">
+            <div className="border-b border-green-900/70 p-6 text-red-700 animate-[archiveBreathe_4s_ease-in-out_infinite]">
 
               <p className="text-xl">
                 [ARQ-03]

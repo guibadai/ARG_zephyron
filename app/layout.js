@@ -1,4 +1,5 @@
 import "./globals.css";
+import ArgAtmosphere from "@/components/ArgAtmosphere";
 
 export const metadata = {
   title: "Observadores",
@@ -8,7 +9,10 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="pt-br">
-      <body>{children}</body>
+      <body>
+        <ArgAtmosphere />
+        {children}
+      </body>
     </html>
   );
 }
