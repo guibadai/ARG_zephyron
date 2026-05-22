@@ -1,7 +1,9 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { readArgState, subscribeArgState } from "@/lib/argState";
 
 const bootScript = [
   { text: "INITIALIZING OBSERVER WORKBENCH...", tone: "ok", delay: 26 },
@@ -284,12 +286,22 @@ function CorruptFrames({ stage }) {
 }
 
 function Desktop() {
+  const router = useRouter();
   const [clock, setClock] = useState("03:33 AM");
   const [windows, setWindows] = useState([]);
   const [entityTouched, setEntityTouched] = useState(false);
   const [entityPulse, setEntityPulse] = useState(false);
+  const [sealBreach, setSealBreach] = useState(false);
   const [randomGlitch, setRandomGlitch] = useState(false);
   const [drag, setDrag] = useState(null);
+  const [argState, setArgState] = useState(null);
+  const entityClicksRef = useRef([]);
+
+  useEffect(() => {
+    queueMicrotask(() => setArgState(readArgState()));
+
+    return subscribeArgState(setArgState);
+  }, []);
 
   useEffect(() => {
     const clockTimer = setInterval(() => {
@@ -348,14 +360,32 @@ function Desktop() {
   };
 
   const triggerEntity = () => {
+    const now = Date.now();
+    const recentClicks = entityTouched
+      ? [...entityClicksRef.current.filter((time) => now - time < 900), now]
+      : [];
+
+    entityClicksRef.current = recentClicks;
+
     setEntityPulse(true);
     setEntityTouched(true);
     playInterference();
+
+    if (recentClicks.length >= 3 && !sealBreach) {
+      setSealBreach(true);
+      setEntityPulse(true);
+      playInterference(0.9);
+
+      setTimeout(() => {
+        router.push("/seal");
+      }, 2800);
+    }
+
     setTimeout(() => setEntityPulse(false), 1900);
   };
 
   return (
-    <main className={`relative min-h-screen cursor-crosshair overflow-hidden bg-[#0b2631] font-mono text-[#d7d2c3] ${entityPulse || randomGlitch ? "animate-[hardShake_80ms_steps(2,end)_infinite]" : ""}`}>
+    <main className={`relative min-h-screen cursor-crosshair overflow-hidden bg-[#0b2631] font-mono text-[#d7d2c3] ${entityPulse || randomGlitch || sealBreach ? "animate-[hardShake_80ms_steps(2,end)_infinite]" : ""}`}>
       <CrtSkin intensity={entityTouched ? "haunted" : "normal"} />
 
       <div className={`absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(17,70,80,0.42),transparent_32%),linear-gradient(135deg,#102f3b,#071923_56%,#050707)] ${entityTouched ? "brightness-75 saturate-50" : ""}`} />
@@ -365,7 +395,7 @@ function Desktop() {
         <div className="flex items-center gap-4">
           <span className="border border-[#777] bg-[#ece8d8] px-2 py-0.5 shadow-[inset_-1px_-1px_#777,inset_1px_1px_#fff]">Observer Workbench</span>
           <span>NODE: OBS-01</span>
-          <span className={entityTouched ? "text-red-800" : ""}>CONTAINMENT: {entityTouched ? "FAILED" : "UNSTABLE"}</span>
+          <span className={entityTouched || (argState?.corruption || 0) > 5 ? "text-red-800" : ""}>CONTAINMENT: {entityTouched || (argState?.corruption || 0) > 5 ? "FAILED" : "UNSTABLE"}</span>
         </div>
         <span className="bg-black px-2 py-0.5 text-green-400">{clock}</span>
       </header>
@@ -382,6 +412,9 @@ function Desktop() {
         />
         <DesktopIcon label="CYCLE_03.log" glyph="LOG" corrupted onClick={() => openWindow("cycle", "CYCLE_03.log", ["LOG DAMAGED", "", "observer entered room", "observer exited room", "observer entered room", "observer exited room", "observer did not leave"])} />
         {entityTouched && <DesktopIcon label="LISTENING" glyph="..." danger active onClick={() => openWindow("listening", "UNKNOWN", ["do not type", "do not blink", "the screen is not the watcher"])} />}
+        {argState?.unlockedFiles?.includes("DANGER.dir") && (
+          <DesktopIcon label="DANGER.dir" glyph="ERR" danger active onClick={() => openWindow("danger", "DANGER.dir", ["DANGER ARCHIVE MOUNTED", "", "machine_mouth.tmp", "clause_0.pointer // removed", "cycle_04_bodymap // repeats", "", "open command: breach"])} />
+        )}
       </section>
 
       {windows.map((windowData) => (
@@ -399,10 +432,10 @@ function Desktop() {
         />
       ))}
 
-      {(entityPulse || randomGlitch) && (
+      {(entityPulse || randomGlitch || sealBreach) && (
         <div className="pointer-events-none fixed inset-0 z-40 grid place-items-center bg-black/35 text-center text-2xl tracking-[0.22em] text-red-500 sm:text-5xl">
           <div className="space-y-3 animate-[textRupture_110ms_steps(2,end)_infinite]">
-            {systemErrors.map((line) => (
+            {(sealBreach ? ["SEAL INTERFACE FOUND", "OBSERVER LOCK SEVERED", "DO NOT TRACE IT"] : systemErrors).map((line) => (
               <p key={line}>{line}</p>
             ))}
           </div>
@@ -412,7 +445,7 @@ function Desktop() {
       <footer className="fixed bottom-0 left-0 right-0 z-20 flex h-10 items-center justify-between border-t-2 border-[#eee] bg-[#b9b6a8] px-2 text-xs text-black shadow-[0_-2px_0_#555]">
         <button className="border border-[#444] bg-[#d8d5c7] px-3 py-1 shadow-[inset_-1px_-1px_#777,inset_1px_1px_#fff]">START</button>
         <div className="flex items-center gap-3">
-          <span className="text-red-800">{entityTouched ? "foreign process attached" : "archive monitor idle"}</span>
+          <span className="text-red-800">{argState?.lastCommand ? `last infection: ${argState.lastCommand}` : entityTouched ? "foreign process attached" : "archive monitor idle"}</span>
           <span className="border border-[#555] bg-[#e6e1d0] px-2 py-1">{clock}</span>
         </div>
       </footer>
@@ -490,7 +523,7 @@ function randomCorruption(length) {
   return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
 }
 
-function playInterference() {
+function playInterference(power = 0.28) {
   const AudioContext = window.AudioContext || window.webkitAudioContext;
 
   if (!AudioContext) return;
@@ -510,7 +543,7 @@ function playInterference() {
 
   filter.type = "bandpass";
   filter.frequency.value = 950;
-  gain.gain.value = 0.28;
+  gain.gain.value = power;
 
   source.buffer = buffer;
   source.connect(filter);

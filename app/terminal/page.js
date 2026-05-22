@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { applyCommandEvent, commandFragments, readArgState, subscribeArgState } from "@/lib/argState";
 
 const correctPassword =
   "thereisnolastchoice";
@@ -10,53 +11,7 @@ const initialLogs = [
   "TYPE HELP FOR COMMANDS."
 ];
 
-const forbiddenCommands = {
-  echo:
-`echo did not return alone.
-
-"someone answered the signal."`,
-
-  witness:
-`WITNESS TABLE:
-
-cycle one: removed
-cycle two: removed
-cycle three: removed
-
-one witness remains unlisted.`,
-
-  cycle:
-`CYCLE REPORT:
-
-the entity remembers previous cycles.
-the archive does not.`,
-
-  signal:
-`SIGNAL DETECTED BELOW ARCHIVE LAYER.
-
-depth: impossible
-source: listening`,
-
-  breach:
-`BREACH EVENT LOG:
-
-containment door closed.
-containment door opened inward.
-no operator found.`,
-
-  mirror:
-`the mirror was never empty.
-
-do not wait for your reflection to move first.`,
-
-  burial:
-`BURIAL UNSUCCESSFUL.
-
-the thing beneath the archive continued transmitting.`,
-
-  repeat:
-`DO NOT REPEAT THE COMMAND.`
-};
+const livingCommands = ["echo", "witness", "cycle", "signal", "breach", "mirror", "burial", "repeat"];
 
 const rareMessages = [
   "HE IS WATCHING",
@@ -81,9 +36,17 @@ export default function Terminal() {
 
   const [corrupt, setCorrupt] = useState(false);
 
+  const [argState, setArgState] = useState(null);
+
   const audioRef = useRef(null);
 
   const terminalRef = useRef(null);
+
+  useEffect(() => {
+    queueMicrotask(() => setArgState(readArgState()));
+
+    return subscribeArgState(setArgState);
+  }, []);
 
   useEffect(() => {
     terminalRef.current?.scrollTo({
@@ -200,9 +163,22 @@ ERROR
 
     }
 
-    else if (forbiddenCommands[cmd]) {
+    else if (livingCommands.includes(cmd)) {
 
-      response = forbiddenCommands[cmd];
+      const current = readArgState();
+      const count = (current.commands[cmd] || 0) + 1;
+      const fragments = commandFragments[cmd] || [];
+      const fragment = fragments[(count - 1) % fragments.length] || "fragment unavailable.";
+
+      response =
+`${cmd.toUpperCase()} EVENT:
+
+${fragment}
+
+site_state:
+corruption pending
+observer awareness shifting
+entity presence not local`;
 
     }
 
@@ -242,14 +218,25 @@ ERROR
     const delay = 260 + Math.floor(Math.random() * 820) + (cmd === "clausula0" ? 900 : 0);
 
     setTimeout(() => {
+      const nextState = livingCommands.includes(cmd) ? applyCommandEvent(cmd) : readArgState();
+
       playTone(response === "UNKNOWN COMMAND" ? "denied" : "reply");
-      setCorrupt(Math.random() > 0.55);
+      setCorrupt(livingCommands.includes(cmd) || Math.random() > 0.55);
       setLogs((prev) => [
         ...prev,
-        response
+        livingCommands.includes(cmd)
+          ? `${response}
+
+ARG STATE MODIFIED:
+corruption=${nextState.corruption}
+awareness=${nextState.awareness}
+presence=${nextState.presence}
+
+deep archive updated.`
+          : response
       ]);
       setThinking(false);
-      setTimeout(() => setCorrupt(false), 360);
+      setTimeout(() => setCorrupt(false), livingCommands.includes(cmd) ? 900 : 360);
     }, delay);
   }
 
@@ -328,7 +315,7 @@ ERROR
 
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-green-900/50 pb-3 text-xs text-green-700">
           <span>OBSERVER TERMINAL // LIVE SHELL</span>
-          <span className="text-red-700">ENTITY INFLUENCE: DETECTED</span>
+          <span className="text-red-700">ENTITY PRESENCE: {argState?.presence ?? "?"}/13</span>
         </div>
 
         <h1 className="arg-title mb-8 break-all text-4xl tracking-widest text-white sm:text-5xl">
@@ -394,6 +381,13 @@ ERROR
           </div>
 
         </section>
+
+        <div className="mt-4 grid gap-3 text-xs uppercase tracking-[0.18em] text-green-800 sm:grid-cols-4">
+          <p>corruption: {argState?.corruption ?? "?"}</p>
+          <p>awareness: {argState?.awareness ?? "?"}</p>
+          <p>cycle: {argState?.cycle ?? "?"}</p>
+          <p>last: {argState?.lastCommand || "none"}</p>
+        </div>
 
       </div>
 

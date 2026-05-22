@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import { readArgState, subscribeArgState } from "@/lib/argState";
 
 const routeProfiles = {
   "/": { low: 42, high: 96, noise: 0.018, pulse: 0.045 },
@@ -16,6 +17,14 @@ export default function ArgAtmosphere() {
   const pathname = usePathname();
   const audioRef = useRef(null);
   const [armed, setArmed] = useState(false);
+  const [argState, setArgState] = useState(null);
+  const [mirrorActive, setMirrorActive] = useState(false);
+
+  useEffect(() => {
+    queueMicrotask(() => setArgState(readArgState()));
+
+    return subscribeArgState(setArgState);
+  }, []);
 
   useEffect(() => {
     if (armed) return;
@@ -82,25 +91,45 @@ export default function ArgAtmosphere() {
     const profile = routeProfiles[pathname] || routeProfiles["/"];
     const audio = audioRef.current;
 
-    audio.low.frequency.setTargetAtTime(profile.low, audio.context.currentTime, 0.6);
-    audio.high.frequency.setTargetAtTime(profile.high, audio.context.currentTime, 0.6);
-    audio.lowGain.gain.setTargetAtTime(profile.pulse, audio.context.currentTime, 0.8);
-    audio.highGain.gain.setTargetAtTime(profile.pulse * 0.32, audio.context.currentTime, 0.8);
-    audio.noiseGain.gain.setTargetAtTime(profile.noise, audio.context.currentTime, 0.8);
+    const corruption = argState?.corruption || 0;
+    const presence = argState?.presence || 0;
+    const infection = Math.min(2.2, 1 + (corruption + presence) / 18);
+
+    audio.low.frequency.setTargetAtTime(profile.low + presence * 1.5, audio.context.currentTime, 0.6);
+    audio.high.frequency.setTargetAtTime(profile.high + corruption * 4, audio.context.currentTime, 0.6);
+    audio.lowGain.gain.setTargetAtTime(profile.pulse * infection, audio.context.currentTime, 0.8);
+    audio.highGain.gain.setTargetAtTime(profile.pulse * 0.32 * infection, audio.context.currentTime, 0.8);
+    audio.noiseGain.gain.setTargetAtTime(profile.noise * infection, audio.context.currentTime, 0.8);
 
     const tremor = setInterval(() => {
       const now = audio.context.currentTime;
-      audio.noiseGain.gain.setTargetAtTime(profile.noise * (1.6 + Math.random()), now, 0.02);
-      audio.noiseGain.gain.setTargetAtTime(profile.noise, now + 0.12, 0.15);
+      audio.noiseGain.gain.setTargetAtTime(profile.noise * infection * (1.6 + Math.random()), now, 0.02);
+      audio.noiseGain.gain.setTargetAtTime(profile.noise * infection, now + 0.12, 0.15);
     }, 5000 + Math.floor(Math.random() * 5000));
 
     return () => clearInterval(tremor);
-  }, [armed, pathname]);
+  }, [armed, pathname, argState]);
+
+  useEffect(() => {
+    const updateMirror = () => {
+      setMirrorActive((argState?.mirrorActiveUntil || 0) > Date.now());
+    };
+
+    updateMirror();
+    const timer = setInterval(updateMirror, 1000);
+
+    return () => clearInterval(timer);
+  }, [argState?.mirrorActiveUntil]);
+
+  const corruption = argState?.corruption || 0;
 
   return (
     <>
-      <div className="arg-crt-overlay" aria-hidden="true" />
-      <div className="arg-ghosting" aria-hidden="true" />
+      <div className="arg-crt-overlay" style={{ opacity: 0.3 + Math.min(corruption, 10) * 0.025 }} aria-hidden="true" />
+      <div className={`arg-ghosting ${mirrorActive ? "arg-mirror-breach" : ""}`} aria-hidden="true" />
+      {corruption >= 6 && (
+        <div className="pointer-events-none fixed inset-0 z-[1088] bg-red-950/10 mix-blend-screen animate-[crtBlink_900ms_steps(2,end)_infinite]" aria-hidden="true" />
+      )}
       <div key={pathname} className="arg-route-flash arg-route-flash--active" aria-hidden="true" />
       {!armed && (
         <div className="pointer-events-none fixed bottom-4 right-4 z-[1200] border border-red-900/60 bg-black/70 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.22em] text-red-300/60">

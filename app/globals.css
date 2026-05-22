@@ -145,6 +145,12 @@ body::after {
   animation: argGhost 4.8s steps(2, end) infinite;
 }
 
+.arg-mirror-breach {
+  opacity: 0.28;
+  transform: scaleX(-1);
+  animation: argMirrorBreach 700ms steps(2, end) infinite;
+}
+
 .arg-route-flash {
   position: fixed;
   inset: 0;
@@ -399,4 +405,23 @@ button:hover {
 @keyframes archiveBreathe {
   0%, 100% { filter: brightness(0.92) contrast(1.05); }
   50% { filter: brightness(1.08) contrast(1.25); }
+}
+
+@keyframes sealDust {
+  0%, 100% { opacity: 0.08; transform: translateY(0) scale(0.7); }
+  40% { opacity: 0.45; transform: translateY(-18px) scale(1.2); }
+  70% { opacity: 0.16; transform: translateY(12px) scale(0.9); }
+}
+
+@keyframes sealGhost {
+  0%, 90%, 100% { opacity: 0.08; transform: translate(0, 0); }
+  92% { opacity: 0.32; transform: translate(2px, -1px); }
+  94% { opacity: 0.02; transform: translate(-2px, 1px); }
+}
+
+@keyframes argMirrorBreach {
+  0% { filter: hue-rotate(0deg); clip-path: inset(0 0 0 0); }
+  35% { filter: hue-rotate(120deg); clip-path: inset(12% 0 24% 0); }
+  70% { filter: hue-rotate(-80deg); clip-path: inset(52% 0 8% 0); }
+  100% { filter: hue-rotate(0deg); clip-path: inset(0 0 0 0); }
 }
